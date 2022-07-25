@@ -1,0 +1,45 @@
+version: '3.7'
+
+volumes:
+    database: ~
+
+###> doctrine/doctrine-bundle ###
+    db-data:
+###< doctrine/doctrine-bundle ###
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: .docker/app/Dockerfile
+        restart: on-failure
+        links:
+            - mysql
+
+    memcached:
+        image: memcached:1.6
+        restart: on-failure
+
+    nginx:
+#        build:
+#            context: .
+#            dockerfile: .docker/nginx/Dockerfile
+        restart: on-failure
+        depends_on:
+            -   app
+        ports:
+            - "8000:80"
+
+    mysql:
+        image: percona:5.6
+        restart: on-failure
+        volumes:
+            - ./.docker/mysql/settings.cnf:/etc/my.cnf.d/settings.cnf
+            - ./.docker/mysql/init.sql:/docker-entrypoint-initdb.d/10-init.sql
+            - database:/var/lib/mysql
+        command: mysqld --sql_mode="" --character-set-server=utf8 --collation-server=utf8_general_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: application
+            MYSQL_USER: application
+            MYSQL_PASSWORD: application
