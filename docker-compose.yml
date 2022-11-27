@@ -3,15 +3,11 @@ version: '3.7'
 volumes:
     database: ~
 
-###> doctrine/doctrine-bundle ###
-    db-data:
-###< doctrine/doctrine-bundle ###
-
 services:
     app:
         build:
             context: .
-            dockerfile: .docker/app/Dockerfile
+            dockerfile: docker/app/Dockerfile
         restart: on-failure
         links:
             - mysql
@@ -21,9 +17,9 @@ services:
         restart: on-failure
 
     nginx:
-#        build:
-#            context: .
-#            dockerfile: .docker/nginx/Dockerfile
+        build:
+            context: .
+            dockerfile: docker/nginx/Dockerfile
         restart: on-failure
         depends_on:
             -   app

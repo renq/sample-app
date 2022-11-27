@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: debug-testrun
+spec:
+  params:
+  - name: url
+    value: git@github.com:renq/sample-app.git
+  taskSpec:
+    params:
+    - name: url
+      type: string
+    steps:
+    - name: check-creds
+      image: alpine/git:v2.24.3
+      script: |
+        #!/usr/bin/env ash
+        set -xe
+        id
+        for f in /tekton/home/.ssh/* ; do
+          cat $f
+        done
+        ln -s /tekton/home/.ssh /root/.ssh
+        git clone $(params.url)

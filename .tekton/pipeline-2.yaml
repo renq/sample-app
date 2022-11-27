@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline2
+spec:
+  description: |
+    Pipeline 2
+  params:
+    - name: repo-url
+      type: string
+      description: The git repo URL to clone from.
+    - name: image-reference
+      type: string
+      description: dockerhub
+  workspaces:
+    - name: shared-data
+    - name: git-credentials
+    - name: docker-credentials
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-data
+        - name: ssh-directory
+          workspace: git-credentials
+      params:
+        - name: url
+          value: $(params.repo-url)
+    - name: show-readme
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: show-readme
+      workspaces:
+        - name: source
+          workspace: shared-data
+    - name: build-push
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: kaniko
+      workspaces:
+      - name: source
+        workspace: shared-data
+      - name: dockerconfig
+        workspace: docker-credentials
+      params:
+      - name: IMAGE
+        value: $(params.image-reference)
+      - name: DOCKERFILE
+        value: /workspace/source/docker/app/Dockerfile
+

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 8888
+    targetPort: 80
+    protocol: TCP
+  clusterIP: None
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      initContainers:
+      - name: wait-for-app
+        image: willwill/wait-for-it
+        args:
+        - app:9000
+        - -t
+        - "10"
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+          - containerPort: 80

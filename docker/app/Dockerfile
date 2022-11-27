@@ -13,8 +13,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-COPY ./.docker/app/zz-custom.ini /usr/local/etc/php/conf.d/zz-custom.ini
-COPY ./.docker/app/wait-for-it.sh /usr/local/bin/wait-for-it.sh
+COPY ./docker/app/zz-custom.ini /usr/local/etc/php/conf.d/zz-custom.ini
+COPY ./docker/app/wait-for-it.sh /usr/local/bin/wait-for-it.sh
 
 
 # Composer
@@ -43,7 +43,7 @@ ENV APP_DEBUG=1 \
 ARG APP_USER_ID=1000
 ARG APP_GROUP_ID=1000
 
-COPY ./.docker/app/zz-dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
+COPY ./docker/app/zz-dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
 RUN usermod -u $APP_USER_ID www-data --shell /bin/bash && groupmod -g $APP_GROUP_ID www-data
 
 USER www-data:www-data

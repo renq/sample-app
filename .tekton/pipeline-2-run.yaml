@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+    name: pipeline2-run
+spec:
+    pipelineRef:
+        name: pipeline2
+    workspaces:
+        - name: shared-data
+          volumeClaimTemplate:
+              spec:
+                  accessModes:
+                      - ReadWriteOnce
+                  resources:
+                      requests:
+                          storage: 1Gi
+        - name: git-credentials
+          secret:
+              secretName: git-credentials
+        - name: docker-credentials
+          secret:
+              secretName: docker-credentials
+    params:
+        - name: repo-url
+          value: https://github.com/renq/sample-app.git
+        - name: image-reference
+          value: renq/sample-app:latest
